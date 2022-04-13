@@ -25,14 +25,6 @@ Advantages compared to existing projects:
 * Works on arguments with any complex data type that does not necessarily need to be hashable (e.g dictionary).
 * Configurability: custom reductions can be defined based on the object type. This reduction is applied to all objects with the corresponding type, even when they belong to complex, composed larger objects. For example, for larger datasets, the user can decide to only hash the length of the dataset and a few samples, instead of the whole dataset. This can lead to huge speedups. The risk on collisions depends on the use case. (see caches directory)
 * 3 cachers available out-of-the-box: (can be extended with custom reducers, see above):
-  * ```shell
-  from cacher import cache
-  ```
-
-  * ```shell
-  from cacher.caches.deep_learning import cache
-  ```
-
-  * ```shell
-  from cacher.caches.speedup_deep_learning import cache
-  ```
+  * from cacher import cache
+  * from cacher.caches.deep_learning import cache
+  * from cacher.caches.speedup_deep_learning import cache`
