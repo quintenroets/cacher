@@ -1,20 +1,16 @@
 import inspect
 import io
 from types import LambdaType, ModuleType
-from typing import Union
+from typing import Callable, Union
 
 from .. import decorator
 
 
 class Reducer:
     @classmethod
-    def reduce_file_objects(cls, _: Union[io.BytesIO, io.BufferedWriter]) -> str:
-        # Closed file pointers cannot and do not need to be pickled for cache functionality
-        return ""
-
-    @classmethod
-    def reduce_lambda_function(cls, function: LambdaType) -> str:
-        # https://www.pythonpool.com/cant-pickle-local-object/
+    def reduce_function(cls, function: Union[Callable, LambdaType]) -> str:
+        # assume cache value can change when function implementation changes
+        # lambda function: https://www.pythonpool.com/cant-pickle-local-object/
         return inspect.getsource(function)
 
     @classmethod
@@ -26,6 +22,11 @@ class Reducer:
             # cannot access source code of builtin modules but no problem because we assume this code does not change
             reduction = module.__name__
         return reduction
+
+    @classmethod
+    def reduce_file_objects(cls, _: Union[io.BytesIO, io.BufferedWriter]) -> str:
+        # Closed file pointers cannot and do not need to be pickled for cache functionality
+        return ""
 
 
 cache = decorator.cache(Reducer)
