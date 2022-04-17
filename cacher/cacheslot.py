@@ -11,8 +11,7 @@ CACHE_MISS = "CACHE_MISS"
 class CacheSlot:
     def __init__(self, key_reducer, function, args, kwargs):
         # change cache key when implementation changes
-        function_implementation = inspect.getsource(function)
-        cache_keys = (function_implementation, args, kwargs)
+        cache_keys = (function, args, kwargs)
         self.location = (
             Path.assets
             / "cache"

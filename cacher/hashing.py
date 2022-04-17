@@ -29,13 +29,22 @@ class HashPickler(pickle.Pickler):
         The goal of this pickler is to create hashes of complex objects, not to reconstruct complex objects.
         So reducer does not need to be a reversible mapping.
         """
-        reduction = NotImplemented
-        for obj_type, mapping in self.reductions.items():
-            if isinstance(obj, obj_type):
-                reduction = mapping(obj)
-                str_value = (str(pickle.dumps(reduction)),)
-                reduction = str, str_value
+        mapping = self.reduction_mapper(obj)
+        if mapping is None:
+            reduction = NotImplemented
+        else:
+            str_value = (str(pickle.dumps(reduction)),)
+            reduction = str, str_value
+
         return reduction
+
+    def reduction_mapper(self, obj):
+        # the str class is used in every custom reduction (see reducer_override)
+        # don't apply custom reduction on the str class to avoid infinite recursive calls
+        if obj != str:
+            for obj_type, mapping in self.reductions.items():
+                if isinstance(obj, obj_type):
+                    return mapping
 
 
 def compute_hash(key_reducer, *args):

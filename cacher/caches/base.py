@@ -8,19 +8,25 @@ from .. import decorator
 
 class Reducer:
     @classmethod
-    def reduce_function(cls, function: Union[Callable, LambdaType]) -> str:
-        # assume cache value can change when function implementation changes
-        # lambda function: https://www.pythonpool.com/cant-pickle-local-object/
-        return inspect.getsource(function)
-
-    @classmethod
-    def reduce_module(cls, module: ModuleType) -> str:
-        # https://stackoverflow.com/questions/2790828/python-cant-pickle-module-objects-error
+    def reduce_code(cls, code_object: Union[Callable, LambdaType, ModuleType]) -> str:
+        # assume cache value can change when function/module implementation changes
+        # custom lambda reduction needed:
+        #   https://www.pythonpool.com/cant-pickle-local-object/
+        # custom module reduction needed:
+        #   https://stackoverflow.com/questions/2790828/python-cant-pickle-module-objects-error
+        if code_object == str:
+            # don't apply custom reduction on str (also a callable) to avoid infinite recursive calls
+            # because everything is reduced to a str
+            reduction = NotImplemented
+            pprint("joe")
+        pprint("ja")
+        pprint(code_object)
         try:
-            reduction = inspect.getsource(module)
-        except TypeError:
-            # cannot access source code of builtin modules but no problem because we assume this code does not change
-            reduction = module.__name__
+            reduction = inspect.getsource(code_object)
+        except:
+            # cannot access source code of builtin function/module
+            # but no problem because we assume this code does not change
+            reduction = code_object.__name__
         return reduction
 
     @classmethod
