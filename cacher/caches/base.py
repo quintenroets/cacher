@@ -1,6 +1,6 @@
 import inspect
 import io
-from types import LambdaType, ModuleType
+from types import FunctionType, ModuleType
 from typing import Callable, Union
 
 from .. import decorator
@@ -8,7 +8,7 @@ from .. import decorator
 
 class Reducer:
     @classmethod
-    def reduce_code(cls, code_object: Union[Callable, LambdaType, ModuleType]) -> str:
+    def reduce_code(cls, code_object: Union[FunctionType, ModuleType]) -> str:
         """
         custom lambda reduction needed:
             https://www.pythonpool.com/cant-pickle-local-object/
@@ -21,7 +21,7 @@ class Reducer:
         try:
             reduction = inspect.getsource(code_object)
         except:
-            # cannot access source code of builtin function/module
+            # cannot access source code of builtins
             # but no problem because we assume this code does not change
             reduction = code_object.__name__
         return reduction
