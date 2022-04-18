@@ -27,15 +27,15 @@ class HashPickler(pickle.Pickler):
     def reducer_override(self, obj: Any) -> Any:
         """
         The goal of this pickler is to create hashes of complex objects, not to reconstruct complex objects.
-        So reducer does not need to be a reversible mapping.
+        So mapping does not need to be reversible.
         """
         mapper = self.reduction_mapper(obj)
         if mapper is None:
             reduction = NotImplemented
         else:
             mapping = mapper(obj)
-            str_value = (str(pickle.dumps(mapping)),)
-            reduction = str, str_value
+            str_tuple = (str(pickle.dumps(mapping)),)
+            reduction = str, str_tuple
 
         return reduction
 

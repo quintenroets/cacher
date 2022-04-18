@@ -9,18 +9,15 @@ from .. import decorator
 class Reducer:
     @classmethod
     def reduce_code(cls, code_object: Union[Callable, LambdaType, ModuleType]) -> str:
-        # assume cache value can change when function/module implementation changes
-        # custom lambda reduction needed:
-        #   https://www.pythonpool.com/cant-pickle-local-object/
-        # custom module reduction needed:
-        #   https://stackoverflow.com/questions/2790828/python-cant-pickle-module-objects-error
-        if code_object == str:
-            # don't apply custom reduction on str (also a callable) to avoid infinite recursive calls
-            # because everything is reduced to a str
-            reduction = NotImplemented
-            pprint("joe")
-        pprint("ja")
-        pprint(code_object)
+        """
+        custom lambda reduction needed:
+            https://www.pythonpool.com/cant-pickle-local-object/
+        custom module reduction needed:
+            https://stackoverflow.com/questions/2790828/python-cant-pickle-module-objects-error
+        name reduction for function/module is not enough because we assume
+        cache result can change when function/module implementation changes
+        """
+
         try:
             reduction = inspect.getsource(code_object)
         except:
