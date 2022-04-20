@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Any, Tuple
 
 import numpy as np
 import torch
@@ -10,10 +10,10 @@ from . import deep_learning
 
 class Reducer(deep_learning.Reducer):
     @classmethod
-    def reduce_np_array(cls, array: np.ndarray) -> Tuple[Tuple[int], np.ndarray]:
+    def reduce_np_array(cls, array: np.ndarray) -> Tuple[Tuple[int], Any]:
         length = len(array)
         # only use part of array for speedup
-        data = array[13 ** 17 % length] if length > 0 else array
+        data = array[13 ** 17 % length] if length > 0 else []
         return array.shape, data
 
     @classmethod
@@ -22,26 +22,23 @@ class Reducer(deep_learning.Reducer):
         length = len(state)
         values = list(state.values())
         # only use part of state for speedup
-        values = values[0], values[length // 2], values[-1]
-        values = tuple(cls.reduce_tensor(v) for v in values)
-        return values
+        return values[0], values[length // 2], values[-1]
 
     @classmethod
     def reduce_dataset(cls, dataset: Dataset):
         # ignore len(dataset) warning
         length = len(dataset)  # noqa
         # only use part of dataset for speedup
-        data = dataset[13 ** 17 % length] if length > 0 else torch.Tensor([])
+        data = dataset[13 ** 17 % length] if length > 0 else []
         if isinstance(data, tuple):
             data, label = data
         else:
             label = None
-        return length, cls.reduce_tensor(data), label
+        return length, data, label
 
     @classmethod
     def reduce_tensor(cls, tensor: torch.Tensor):
-        np_array = tensor.detach().cpu().numpy()
-        return cls.reduce_np_array(np_array)
+        return tensor.detach().cpu().numpy()
 
 
 cache = decorator.cache(Reducer)

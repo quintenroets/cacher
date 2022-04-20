@@ -7,6 +7,13 @@ from .. import decorator
 
 
 class Reducer:
+    """
+    Enherit from this class to implement own custom pickler.
+    The result of each function are pickled further with their custom pickling function,
+    so make sure to reduce each object to a new object in each reduction function
+    in order to avoid infinity recursive calls.
+    """
+
     @classmethod
     def reduce_code(cls, code_object: Union[FunctionType, ModuleType]) -> str:
         """
@@ -20,7 +27,7 @@ class Reducer:
 
         try:
             reduction = inspect.getsource(code_object)
-        except:
+        except TypeError:
             # cannot access source code of builtins
             # but no problem because we assume this code does not change
             reduction = code_object.__name__
