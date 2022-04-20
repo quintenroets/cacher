@@ -16,6 +16,7 @@ class HashPickler(pickle.Pickler):
         if reducer is None:
             reducer = Reducer
 
+        self.reducer = reducer
         self.reducers = {}
         for name, method in inspect.getmembers(reducer, predicate=inspect.ismethod):
             type_hints = get_type_hints(method).values()
@@ -34,7 +35,7 @@ class HashPickler(pickle.Pickler):
             reduction = NotImplemented
         else:
             mapping = reducer(obj)
-            str_mapping = str(pickle.dumps(mapping))
+            str_mapping = str(object_to_bytes(self.reducer, mapping))
             reduction = str, (str_mapping,)
 
         return reduction
@@ -46,17 +47,14 @@ class HashPickler(pickle.Pickler):
 
 
 def compute_hash(key_reducer, *args):
-    try:
-        hash_function = hashlib.sha256(usedforsecurity=False)
-    except TypeError:
-        hash_function = hashlib.sha256()
+    data = object_to_bytes(key_reducer, args)
+    # use fast hash function because it is not used for security
+    return hashlib.new("sha1", data=data, usedforsecurity=False).hexdigest()
 
+
+def object_to_bytes(key_reducer: Reducer, args: Any) -> bytes:
     with io.BytesIO() as fp:
-        # use pickler to generate bytes and hash from complex structures
-        pickler = HashPickler(key_reducer, fp)
-        pickler.dump(args)
-
+        # Use custom pickler to generate bytes from complex structures
+        HashPickler(key_reducer, fp).dump(args)
         fp.seek(0)
-        hash_function.update(fp.read())
-
-    return hash_function.hexdigest()
+        return fp.read()
