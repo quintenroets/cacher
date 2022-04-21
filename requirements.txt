@@ -1,0 +1,1 @@
+superpathlib @ git+https://github.com/quintenroets/superpathlib
