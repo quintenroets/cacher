@@ -23,10 +23,10 @@ def cache(key_reducer=None):
         @wraps(function)
         def wrapped_function(*args, **kwargs):
             cache_slot = cacheslot.CacheSlot(key_reducer, function, args, kwargs)
-            value = cache_slot.get_value()
+            value = cache_slot.value
             if value is cacheslot.CACHE_MISS:
                 value = function(*args, **kwargs)
-                cache_slot.set_value(value)
+                cache_slot.value = value
             return value
 
         return wrapped_function

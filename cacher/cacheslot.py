@@ -1,9 +1,8 @@
 import inspect
 import pickle
 
-from plib import Path
-
 from . import hashing
+from .path import Path
 
 CACHE_MISS = "CACHE_MISS"
 
@@ -13,26 +12,26 @@ class CacheSlot:
         # change cache key when implementation changes
         cache_keys = (function, args, kwargs)
         self.location = (
-            Path.assets
-            / "cache"
+            Path.cache
             / function.__module__.replace(".", "_")
             / function.__name__
             / hashing.compute_hash(key_reducer, cache_keys)
         )
 
-    def get_value(self):
-        if self.location.exists():
-            with self.location.open("rb") as fp:
-                try:
-                    value = pickle.Unpickler(fp).load()
-                except pickle.UnpicklingError:
-                    # recalculate corrupted files
-                    value = CACHE_MISS
-        else:
+    @property
+    def value(self):
+        try:
+            value = self.load_value()
+        except (pickle.UnpicklingError, EOFError):
+            # discard values of corrupted or empty slots
             # Don't use None because some functions effectively have None as cached result
             value = CACHE_MISS
         return value
 
-    def set_value(self, value):
-        with self.location.open("wb") as fp:
-            pickle.dump(value, fp)
+    def load_value(self):
+        with self.location.open("rb") as fp:
+            return pickle.Unpickler(fp).load()
+
+    @value.setter
+    def value(self, value):
+        self.location.byte_content = pickle.dumps(value)
