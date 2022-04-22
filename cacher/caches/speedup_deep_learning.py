@@ -21,8 +21,13 @@ class Reducer(deep_learning.Reducer):
         state = super(Reducer, cls).reduce_model(model)
         length = len(state)
         values = list(state.values())
-        # only use part of state for speedup
-        return values[0], values[length // 2], values[-1]
+        if length > 0:
+            # only use part of state for speedup
+            reduction_indices = (0, length // 2, -1)
+            reduction = tuple(values[i] for i in reduction_indices)
+        else:
+            reduction = []
+        return reduction
 
     @classmethod
     def reduce_dataset(cls, dataset: Dataset):
