@@ -12,8 +12,9 @@ class Reducer(deep_learning.Reducer):
     @classmethod
     def reduce_np_array(cls, array: np.ndarray) -> Tuple[Tuple[int], Any]:
         shape = array.shape
+        length = shape[0] if shape else 0
         # only use part of array for speedup
-        data = array[13 ** 17 % shape[-1]] if shape else []
+        data = array[13 ** 17 % length] if length > 0 else []
         return shape, data
 
     @classmethod
