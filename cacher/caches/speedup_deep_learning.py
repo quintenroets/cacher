@@ -11,10 +11,10 @@ from . import deep_learning
 class Reducer(deep_learning.Reducer):
     @classmethod
     def reduce_np_array(cls, array: np.ndarray) -> Tuple[Tuple[int], Any]:
-        length = len(array)
+        shape = array.shape
         # only use part of array for speedup
-        data = array[13 ** 17 % length] if length > 0 else []
-        return array.shape, data
+        data = array[13 ** 17 % shape[-1]] if shape else []
+        return shape, data
 
     @classmethod
     def reduce_model(cls, model: torch.nn.Module):
