@@ -14,7 +14,7 @@ class Reducer(deep_learning.Reducer):
         shape = array.shape
         length = shape[0] if shape else 0
         # only use part of array for speedup
-        data = array[13 ** 17 % length] if length > 0 else []
+        data = array[13**17 % length] if length > 0 else []
         return shape, data
 
     @classmethod
@@ -35,7 +35,7 @@ class Reducer(deep_learning.Reducer):
         # ignore len(dataset) warning
         length = len(dataset)  # noqa
         # only use part of dataset for speedup
-        data = dataset[13 ** 17 % length] if length > 0 else []
+        data = dataset[13**17 % length] if length > 0 else []
         if isinstance(data, tuple):
             data, label = data
         else:

@@ -1,7 +1,7 @@
 import inspect
 import io
 from types import FunctionType, ModuleType
-from typing import Callable, Union
+from typing import Union
 
 from .. import decorator
 
