@@ -7,11 +7,14 @@ CACHE_MISS = "CACHE_MISS"
 
 
 class CacheSlot:
-    def __init__(self, key_reducer, function, args, kwargs):
+    def __init__(self, function, args, kwargs, key_reducer=None, cache_path=None):
         # change cache key when implementation changes
         cache_keys = (function, args, kwargs)
+        if cache_path is None:
+            cache_path = Path.cache
+
         self.location = (
-            Path.cache
+            cache_path
             / function.__module__.replace(".", "_")
             / function.__name__
             / hashing.compute_hash(key_reducer, cache_keys)

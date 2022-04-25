@@ -3,7 +3,7 @@ from functools import wraps
 from . import cacheslot
 
 
-def cache(key_reducer=None):
+def cache(key_reducer=None, cache_path=None):
     """
     A decorator to cache function results.
     Decorated functions are only executed if result is not present in cache.
@@ -22,7 +22,9 @@ def cache(key_reducer=None):
     def cache_decorator(function):
         @wraps(function)
         def wrapped_function(*args, **kwargs):
-            cache_slot = cacheslot.CacheSlot(key_reducer, function, args, kwargs)
+            cache_slot = cacheslot.CacheSlot(
+                function, args, kwargs, key_reducer, cache_path
+            )
             value = cache_slot.value
             if value is cacheslot.CACHE_MISS:
                 value = function(*args, **kwargs)
