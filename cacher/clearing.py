@@ -9,6 +9,7 @@ from .path import Path
 
 def clear(args):
     min_mtime_to_clear = time.time() - int(args.max_age) * 60 if args.max_age else None
+    cache_path = Path(args.cache_path)
 
     def remove_entry(path: Path):
         return (
@@ -18,10 +19,10 @@ def clear(args):
         )
 
     with cli.status("Removing.."):
-        for path in Path.cache.find(remove_entry, recurse_on_match=True):
+        for path in Path(cache_path).find(remove_entry, recurse_on_match=True):
             if args.verbose:
                 pprint(
-                    f"{path.relative_to(Path.cache)} ({datetime.fromtimestamp(path.mtime)})"
+                    f"{path.relative_to(cache_path)} ({datetime.fromtimestamp(path.mtime)})"
                 )
             path.unlink()
 
@@ -33,6 +34,11 @@ def main():
         "--max-age",
         default=None,
         help=f"Maximal age of cache entries to delete (minutes)",
+    )
+    parser.add_argument(
+        "--cache-path",
+        default=Path.cache,
+        help=f"Root path of cache folder",
     )
     parser.add_argument("--verbose", default=True, help=f"Show removed entries")
     args = parser.parse_args()
