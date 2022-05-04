@@ -14,6 +14,8 @@ class HashPickler(pickle.Pickler):
     def __init__(self, reducer: Type[Reducer], fp):
         super().__init__(fp)
         if reducer is None:
+            from .caches.base import Reducer  # noqa: autoimport
+
             reducer = Reducer
 
         self.reducer = reducer
