@@ -43,9 +43,10 @@ class HashPickler(pickle.Pickler):
         return reduction
 
     def get_reducer(self, obj):
-        for obj_type, reducer in self.reducers.items():
-            if isinstance(obj, obj_type):
-                return reducer
+        if obj is not str:
+            for obj_type, reducer in self.reducers.items():
+                if isinstance(obj, obj_type):
+                    return reducer
 
 
 def compute_hash(key_reducer, *args):

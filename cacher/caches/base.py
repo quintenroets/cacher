@@ -15,20 +15,20 @@ class Reducer:
     """
 
     @classmethod
-    def reduce_code(cls, code_object: Union[FunctionType, ModuleType]) -> str:
+    def reduce_code(cls, code_object: Union[FunctionType, ModuleType, type]) -> str:
         """
         custom lambda reduction needed:
             https://www.pythonpool.com/cant-pickle-local-object/
         custom module reduction needed:
             https://stackoverflow.com/questions/2790828/python-cant-pickle-module-objects-error
-        name reduction for function/module is not enough because we assume
-        cache result can change when function/module implementation changes
+        name reduction for function/module/class is not enough because we assume
+        cache result can change when function/module/class implementation changes
         """
 
         try:
             reduction = inspect.getsource(code_object)
-        except TypeError:
-            # cannot access source code of builtins
+        except (TypeError, OSError):
+            # cannot access source code of builtins or common libraries
             # but no problem because we assume this code does not change
             reduction = code_object.__name__
         return reduction
