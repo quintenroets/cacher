@@ -1,3 +1,4 @@
+import math
 from typing import Any, Tuple
 
 import numpy as np
@@ -12,10 +13,16 @@ class Reducer(deep_learning.Reducer):
     @classmethod
     def reduce_np_array(cls, array: np.ndarray) -> Tuple[Tuple[int], Any]:
         shape = array.shape
-        length = shape[0] if shape else 0
-        # only use part of array for speedup
-        data = array[13**17 % length] if length > 0 else []
-        return shape, data
+        if shape and math.prod(shape) > 10000:
+            # only use part of array large for speedup
+            length = shape[0] if shape else 0
+            data = (array[13**17 % length]) if length > 0 else []
+            reduction = shape, data
+        elif shape:
+            reduction = list(array)
+        else:
+            reduction = array.item()
+        return reduction
 
     @classmethod
     def reduce_model(cls, model: torch.nn.Module):
