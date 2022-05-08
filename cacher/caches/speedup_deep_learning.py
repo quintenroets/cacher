@@ -8,6 +8,8 @@ from torch.utils.data import Dataset
 from .. import decorator
 from . import deep_learning
 
+SEED_VALUE = 493
+
 
 class Reducer(deep_learning.Reducer):
     @classmethod
@@ -41,12 +43,17 @@ class Reducer(deep_learning.Reducer):
     def reduce_dataset(cls, dataset: Dataset):
         # ignore len(dataset) warning
         length = len(dataset)  # noqa
+
+        # fix random seed to have deterministic hash for datasets with random augmentation
+        torch.random.manual_seed(SEED_VALUE)
+
         # only use part of dataset for speedup
         data = dataset[13**17 % length] if length > 0 else []
         if isinstance(data, tuple):
             data, label = data
         else:
             label = None
+
         return length, data, label
 
     @classmethod
