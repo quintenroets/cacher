@@ -28,16 +28,16 @@ class Reducer(deep_learning.Reducer):
 
     @classmethod
     def reduce_model(cls, model: torch.nn.Module):
-        state = super(Reducer, cls).reduce_model(model)
-        length = len(state)
-        values = list(state.values())
+        weights, implementation = super(Reducer, cls).reduce_model(model)
+
+        length = len(weights)
         if length > 0:
-            # only use part of state for speedup
+            # only use part of weights for speedup
+            values = list(weights.values())
             reduction_indices = (0, length // 2, -1)
-            reduction = tuple(values[i] for i in reduction_indices)
-        else:
-            reduction = []
-        return reduction
+            weights = tuple(values[i] for i in reduction_indices)
+
+        return weights, implementation
 
     @classmethod
     def reduce_dataset(cls, dataset: Dataset):
