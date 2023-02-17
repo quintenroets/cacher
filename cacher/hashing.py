@@ -22,10 +22,11 @@ class HashPickler(pickle.Pickler):
         self.reducers = {}
         for name, method in inspect.getmembers(reducer, predicate=inspect.ismethod):
             type_hints = get_type_hints(method).values()
-            argument_type = next(iter(type_hints))
-            argument_types = get_args(argument_type) or (argument_type,)
-            for argument_type in argument_types:
-                self.reducers[argument_type] = method
+            if type_hints:
+                argument_type = next(iter(type_hints))
+                argument_types = get_args(argument_type) or (argument_type,)
+                for argument_type in argument_types:
+                    self.reducers[argument_type] = method
 
     def reducer_override(self, obj: Any) -> Any:
         """
