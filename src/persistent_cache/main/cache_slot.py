@@ -30,8 +30,8 @@ class CacheSlot:
         try:
             with self.path.open("rb") as fp:
                 return pickle.Unpickler(fp).load()  # noqa: S301
-        except (pickle.UnpicklingError, EOFError):
-            # discard values of corrupted or empty slots
+        except (FileNotFoundError, pickle.UnpicklingError, EOFError):
+            # discard values of missing, corrupted or empty slots
             raise KeyError from None
 
     @value.setter
